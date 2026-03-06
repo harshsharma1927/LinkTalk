@@ -45,8 +45,8 @@ export const ChatWindow = ({
   }, [selectedContact]);
 
   return (
-    <div className="flex-1 flex flex-col h-screen bg-slate-50">
-      <div className="p-4 border-b bg-white flex justify-between items-center">
+    <div className="flex-1 flex flex-col h-screen bg-gradient-to-r from-blue-300 via-blue-100 to-gray-300">
+      <div className="p-4 border-b bg-blue-100 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-600">
             {selectedContact ? headerInitials || 'U' : '?'}
@@ -128,10 +128,10 @@ export const ChatWindow = ({
         )}
       </div>
 
-      <div className="p-4 bg-white border-t">
+      <div className="p-4 bg-gradient-to-r from-gray-300 via-blue-100 to-blue-300 border-t">
         <form
           onSubmit={handleSubmit}
-          className="flex items-center gap-2 bg-slate-100 p-2 rounded-2xl"
+          className="flex items-center gap-2 bg-white p-2 rounded-2xl"
         >
           <input
             type="text"
@@ -174,7 +174,7 @@ export const ChatWindow = ({
           <button
             type="submit"
             disabled={!selectedContact || !draft.trim()}
-            className="bg-indigo-600 p-2 rounded-xl text-white hover:bg-indigo-700 transition-all active:scale-90 disabled:opacity-60 disabled:active:scale-100"
+            className="bg-green-600 p-2 rounded-xl text-white hover:bg-green-700 transition-all active:scale-90 disabled:opacity-60 disabled:active:scale-100"
           >
             <Send size={18} />
           </button>

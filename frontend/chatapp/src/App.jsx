@@ -265,20 +265,20 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
-      <div className="hidden md:block w-80 border-r border-slate-100">
+    <div className="flex h-screen overflow-hidden bg-black">
+      <div className="hidden md:block w-80 border-r border-black">
         <div className="p-6 flex items-center justify-between">
           <div>
-            <div className="font-bold text-2xl text-indigo-600">ChatApp</div>
+            <div className="font-bold text-3xl text-blue-600">LinkTalk</div>
             {currentUser && (
-              <div className="text-xs text-slate-400 mt-1">
-                Signed in as {currentUser.name || currentUser.email}
+              <div className="text-x text-slate-400 mt-1">
+                Hey {currentUser.name || currentUser.email}
               </div>
             )}
           </div>
           <button
             onClick={handleLogout}
-            className="text-[10px] text-slate-400 underline hover:text-slate-600"
+            className="text-[13px] text-slate-400 underline hover:text-slate-600"
           >
             Logout
           </button>
