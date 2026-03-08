@@ -253,7 +253,7 @@ export default function App() {
       <div
         className="min-h-screen flex items-center justify-center bg-center bg-cover"
         style={{
-          backgroundImage: "url('src/assets/linktalk_logo_animation.gif')",
+          backgroundImage: "url('/linktalk_logo_animation.gif')",
           backgroundPosition: "center 47%"
         }}
       >
