@@ -50,7 +50,7 @@ export const AuthForm = ({ mode = 'login', onAuthenticated }) => {
   };
 
   return (
-    <div className="w-full max-w-md p-8 bg-white rounded-[2rem] shadow-2xl shadow-indigo-100 border border-slate-100">
+    <div className="w-full max-w-md p-8 bg-blue-300 rounded-[2rem] shadow-2xl shadow-indigo-100 border border-slate-100">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-slate-800">
           {formMode === 'login' ? 'Welcome Back' : 'Join Us'}
@@ -94,7 +94,7 @@ export const AuthForm = ({ mode = 'login', onAuthenticated }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:hover:translate-y-0"
+          className="w-full bg-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 hover:bg-green-400 hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:hover:translate-y-0"
         >
           {isSubmitting
             ? formMode === 'login'
@@ -113,7 +113,7 @@ export const AuthForm = ({ mode = 'login', onAuthenticated }) => {
         <button
           type="button"
           onClick={toggleMode}
-          className="text-indigo-600 font-bold ml-1 hover:underline text-sm"
+          className="text-green-900 font-bold ml-1 hover:underline text-sm"
         >
           {formMode === 'login' ? 'Sign Up' : 'Log In'}
         </button>

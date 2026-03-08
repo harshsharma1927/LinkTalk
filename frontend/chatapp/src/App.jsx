@@ -51,9 +51,9 @@ export default function App() {
       const otherPartyId = senderId === currentUser.id ? receiverId : senderId;
       const timeLabel = message.createdAt
         ? new Date(message.createdAt).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          })
+          hour: '2-digit',
+          minute: '2-digit',
+        })
         : '';
 
       setLastMessageByUserId((prev) => ({
@@ -161,7 +161,7 @@ export default function App() {
       })
       .then(() =>
         apiFetch(`/messages/${selectedContact._id}/read`, { method: 'POST' }).catch(
-          () => {}
+          () => { }
         )
       )
       .catch(() => {
@@ -229,9 +229,9 @@ export default function App() {
                 : text.trim(),
             time: newMessage.createdAt
               ? new Date(newMessage.createdAt).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
+                hour: '2-digit',
+                minute: '2-digit',
+              })
               : '',
           },
         }));
@@ -250,7 +250,13 @@ export default function App() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-indigo-50/30">
+      <div
+        className="min-h-screen flex items-center justify-center bg-center bg-cover"
+        style={{
+          backgroundImage: "url('src/assets/linktalk_logo_animation.gif')",
+          backgroundPosition: "center 47%"
+        }}
+      >
         <AuthForm mode="login" onAuthenticated={handleAuthSuccess} />
       </div>
     );
