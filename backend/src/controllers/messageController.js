@@ -119,12 +119,87 @@ const markConversationRead = async (req, res, next) => {
 };
 
 /**
- * GET /api/messages/users/list - All users except current (for chat list).
+ * GET /api/messages/users/list - All users except current (legacy; no longer used for sidebar).
  */
 const getUsers = async (req, res, next) => {
   const currentUserId = req.user.id;
   const users = await User.find({ _id: { $ne: currentUserId } })
     .select('name email _id')
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    data: { users },
+  });
+};
+
+/**
+ * GET /api/messages/conversations - Users the current user has exchanged messages with.
+ * Used to populate the sidebar so it only shows actual conversations.
+ */
+const getConversationUsers = async (req, res, next) => {
+  const currentUserId = req.user.id;
+
+  const messages = await Message.find({
+    $or: [{ sender: currentUserId }, { receiver: currentUserId }],
+  })
+    .select('sender receiver')
+    .lean();
+
+  const otherUserIdsSet = new Set();
+  for (const m of messages) {
+    const senderId = m.sender && m.sender.toString();
+    const receiverId = m.receiver && m.receiver.toString();
+    if (senderId && senderId !== currentUserId) otherUserIdsSet.add(senderId);
+    if (receiverId && receiverId !== currentUserId) {
+      otherUserIdsSet.add(receiverId);
+    }
+  }
+
+  const otherUserIds = Array.from(otherUserIdsSet);
+  if (otherUserIds.length === 0) {
+    return res.status(200).json({
+      success: true,
+      data: { users: [] },
+    });
+  }
+
+  const users = await User.find({ _id: { $in: otherUserIds } })
+    .select('name email _id')
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    data: { users },
+  });
+};
+
+const escapeRegex = (value) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * GET /api/messages/users/search?q=term - Search users by name/email, excluding current user.
+ * This is used to find someone to start a new conversation with.
+ */
+const searchUsers = async (req, res, next) => {
+  const currentUserId = req.user.id;
+  const raw = (req.query.q || '').trim();
+
+  if (!raw) {
+    return res.status(200).json({
+      success: true,
+      data: { users: [] },
+    });
+  }
+
+  const regex = new RegExp(escapeRegex(raw), 'i');
+
+  const users = await User.find({
+    _id: { $ne: currentUserId },
+    $or: [{ name: regex }, { email: regex }],
+  })
+    .select('name email _id')
+    .limit(20)
     .lean();
 
   res.status(200).json({
@@ -148,6 +223,8 @@ module.exports = {
   sendMessage,
   getMessages,
   markConversationRead,
+  getConversationUsers,
+  searchUsers,
   getUsers,
   getOnlineUsers,
 };

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Send, MoreVertical, Phone } from 'lucide-react';
+import { Send, MoreVertical, Phone, Menu } from 'lucide-react';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 
@@ -11,6 +11,7 @@ export const ChatWindow = ({
   onSendMessage,
   isOtherTyping,
   onTyping,
+  onOpenSidebar,
 }) => {
   const [draft, setDraft] = useState('');
   const isTypingLocalRef = useRef(false);
@@ -48,6 +49,13 @@ export const ChatWindow = ({
     <div className="flex-1 flex flex-col h-screen bg-gradient-to-r from-blue-300 via-blue-100 to-gray-300">
       <div className="p-4 border-b bg-blue-100 flex justify-between items-center">
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="md:hidden mr-1 p-1 rounded-full text-slate-600 hover:bg-blue-200"
+            onClick={onOpenSidebar}
+          >
+            <Menu size={20} />
+          </button>
           <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-600">
             {selectedContact ? headerInitials || 'U' : '?'}
           </div>

@@ -15,7 +15,11 @@ export default function App() {
   const [typingByUserId, setTypingByUserId] = useState({});
   const [unreadCounts, setUnreadCounts] = useState({});
   const [lastMessageByUserId, setLastMessageByUserId] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
   const typingTimersRef = useRef({});
+  const searchDebounceRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -139,7 +143,7 @@ export default function App() {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    apiFetch('/messages/users/list')
+    apiFetch('/messages/conversations')
       .then((res) => {
         setContacts(res?.data?.users || []);
       })
@@ -147,6 +151,34 @@ export default function App() {
         setContacts([]);
       });
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const q = searchQuery.trim();
+
+    if (!q) {
+      setSearchResults([]);
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+        searchDebounceRef.current = null;
+      }
+      return;
+    }
+
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+
+    searchDebounceRef.current = setTimeout(() => {
+      apiFetch(`/messages/users/search?q=${encodeURIComponent(q)}`)
+        .then((res) => {
+          setSearchResults(res?.data?.users || []);
+        })
+        .catch(() => {
+          setSearchResults([]);
+        });
+    }, 300);
+  }, [isAuthenticated, searchQuery]);
 
   useEffect(() => {
     if (!isAuthenticated || !selectedContact) {
@@ -200,6 +232,9 @@ export default function App() {
     setTypingByUserId({});
     setUnreadCounts({});
     setLastMessageByUserId({});
+    setSearchQuery('');
+    setSearchResults([]);
+    setIsSidebarOpenMobile(false);
     Object.values(typingTimersRef.current).forEach((t) => clearTimeout(t));
     typingTimersRef.current = {};
     disconnectSocket();
@@ -235,6 +270,11 @@ export default function App() {
               : '',
           },
         }));
+        setContacts((prev) => {
+          if (!selectedContact?._id) return prev;
+          if (prev.some((c) => c._id === selectedContact._id)) return prev;
+          return [...prev, selectedContact];
+        });
       }
     } catch {
       // Silently fail for now; could surface a toast/alert
@@ -268,10 +308,38 @@ export default function App() {
     setUnreadCounts((prev) => ({ ...prev, [contact._id]: 0 }));
     const socket = getSocket();
     if (socket) socket.emit('markRead', { withUserId: contact._id });
+    setIsSidebarOpenMobile(false);
+  };
+
+  const handleSelectSearchResult = (user) => {
+    if (!user) return;
+    handleSelectContact(user);
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-black">
+    <div className="flex h-screen overflow-hidden bg-black relative">
+      {isSidebarOpenMobile && (
+        <div className="fixed inset-0 z-40 flex md:hidden">
+          <div
+            className="flex-1 bg-black/40"
+            onClick={() => setIsSidebarOpenMobile(false)}
+          />
+          <div className="w-72 max-w-full h-full bg-black shadow-xl">
+            <Sidebar
+              contacts={contacts}
+              selectedContactId={selectedContact?._id || null}
+              onSelectContact={handleSelectContact}
+              unreadCounts={unreadCounts}
+              lastMessageByUserId={lastMessageByUserId}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchResults={searchResults}
+              onSelectSearchResult={handleSelectSearchResult}
+              onClose={() => setIsSidebarOpenMobile(false)}
+            />
+          </div>
+        </div>
+      )}
       <div className="hidden md:block w-80 border-r border-black">
         <div className="p-6 flex items-center justify-between">
           <div>
@@ -295,6 +363,10 @@ export default function App() {
           onSelectContact={handleSelectContact}
           unreadCounts={unreadCounts}
           lastMessageByUserId={lastMessageByUserId}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchResults={searchResults}
+          onSelectSearchResult={handleSelectSearchResult}
         />
       </div>
       <ChatWindow
@@ -307,6 +379,7 @@ export default function App() {
           selectedContact && typingByUserId[selectedContact._id]
         )}
         onTyping={handleTyping}
+        onOpenSidebar={() => setIsSidebarOpenMobile(true)}
       />
     </div>
   );
